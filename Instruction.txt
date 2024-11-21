@@ -1,0 +1,35 @@
+## 1.  Only need to use a very small set of supervised annotation data(like 8 pictures depends on the dataset) to Train a pre-model, use this pre-trained model to predict the pseudo labels on entire dataset.
+##
+## 2. "point_labels_URL" is the folder path to put the Point-annotation data.
+
+## 3. "inferenced_labels_URL" is the folder path to put predicted pseudo labels.
+
+## 4. "Sparse_Generation_save_URL" is the output derictory of Sparse Generation, which in yolo txt format for easy to demonstration.
+
+## 5. "Final_save_URL" is the final output derictory of Sparse Generation.
+
+## 6. "epochs" is to set the epochs for parameter updating.
+
+## 7. "val_labels_URL" is the folder path to put the small amount supervised labels.
+
+## 8. "inferenced_val_labels_URL" is to set the path which pseudo labels predicted from the small amount supervised pictures.
+
+
+##  If your detector model output the COCO json or VOC format annotation, transforming them to yolo txt format.
+
+##  The other initial parameters were already set.
+
+Environment: 
+    python >=3.7 is ok.
+    pytorch >=1.9.0 is ok.
+    our cuda version is 11.6.
+
+How to run:
+    command: # 
+     python Code_for_Sparse_Generation.py --inferenced_labels_URL --Sparse_Generation_save_URL --val_labels_URL --inferenced_val_labels_URL --Sparse_generation_val_labels_save_URL --point_labels_URL --epochs --Final_save_URL  
+
+Dataset:
+        The Bullet-Hole dataset will be realsed with whole project on GitHub.
+
+
+
