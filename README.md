@@ -22,7 +22,7 @@ If your detector model output the COCO json or VOC format annotation, transformi
 
    The initial parameters were already set. run command:
     
-     python Code_for_Sparse_Generation.py --inferenced_labels_URL --Sparse_Generation_save_URL --val_labels_URL --inferenced_val_labels_URL --Sparse_generation_val_labels_save_URL --point_labels_URL --epochs --Final_save_URL  
+     python Sparse_Generation.py --inferenced_labels_URL --Sparse_Generation_save_URL --val_labels_URL --inferenced_val_labels_URL --Sparse_generation_val_labels_save_URL --point_labels_URL --epochs --Final_save_URL  
  
 
 1. "point_labels_URL" is the folder path to put the Point-annotation data.
