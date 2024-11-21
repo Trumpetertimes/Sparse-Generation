@@ -19,7 +19,7 @@ SIMD dataset (https://github.com/ihians/simd.git)
 
 
 ## How to run:
-Only need to use a small set of supervised annotation data to Train a pre-model, use this pre-trained model to predict the pseudo labels on entire dataset.
+Only need to use a small set of supervised annotation data to train a pre-model, use this pre-trained model to predict the pseudo labels on entire dataset.
 We validated on four different datasets(MS COCO-5000, RSOD, SIMD, Bullet-Hole).
 
 ![image](https://github.com/Trumpetertimes/Sparse_Generation/blob/master/SPexperiment0912.png)
