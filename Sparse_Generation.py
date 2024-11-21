@@ -36,7 +36,7 @@ import torch as torch
 torch.set_printoptions(precision=None, threshold=400, edgeitems=None, linewidth=None, profile=None)
 
 
-class Location:  # 每个预测标签
+class Location:  # Each predicted label
     def __init__(self):
         self.x = 0
         self.y = 0
@@ -64,7 +64,7 @@ class Heatmap:
         # print(self.conf , ' ' , self.x , ' ' , self.y , ' ' , self.w , ' ' , self.h)
         # print(self.matrix)
 
-    def get_heatmap_matrix(self, location):  # 初始化一个预测框的张量
+    def get_heatmap_matrix(self, location):  # Initialize a tensor for a prediction box
         # device = torch.device('cuda' if torch.cuda.is_available else 'cpu')
         self.class_name = location[0]
         self.x = location[1]
@@ -72,10 +72,10 @@ class Heatmap:
         self.w = location[3]
         self.h = location[4]
         # self.conf = location[5]
-        self.x = self.x * self.bias  # 可选择乘以偏离权重
+        self.x = self.x * self.bias  # Optional multiplication by deviation weight
         self.y = self.y * self.bias
 
-        if int(self.w / 2) % 2 == 0:  # 按2个像素大小为间隔规定二维张量大小,并将其规定为奇数。
+        if int(self.w / 2) % 2 == 0:  # Specify the size of the two-dimensional tensor at intervals of 2 pixels and set it as an odd number.
             matrix_w = int(self.w / 2) + 1
         else:
             matrix_w = int(self.w / 2)
@@ -84,14 +84,14 @@ class Heatmap:
         else:
             matrix_h = int(self.h / 2)
 
-        self.matrix = torch.ones([matrix_h, matrix_w])  # 按2个像素大小为间隔规定二维张量大小,并将其规定为奇数。
+        self.matrix = torch.ones([matrix_h, matrix_w])  # Specify the size of the two-dimensional tensor at intervals of 2 pixels and set it as an odd number.
         self.matrix_w = matrix_w
         self.matrix_h = matrix_h
         # print(self.conf,' ',self.x,' ',self.y,' ',self.w,' ',self.h)
         # print(self.matrix)
         return self
 
-    def convert_function(self, x, y, w):  # 根据预测框大小生成一个张量
+    def convert_function(self, x, y, w):  # Generate a tensor based on the predicted box size
 
         center_x = int(self.matrix_w / 2)
         center_y = int(self.matrix_h / 2)
@@ -182,7 +182,7 @@ class Big_HeatMap41Pic:
     def Fusion_heatmaps2big1(self):
         return
 
-    def Padding_heatmaps(self):  # 将得到的每个预测框对应的张量填充到和图片一样的大小
+    def Padding_heatmaps(self):  # Fill the tensor corresponding to each predicted box obtained to the same size as the image
 
         i = 0
         while i < len(self.heatmaps):
@@ -195,9 +195,9 @@ class Big_HeatMap41Pic:
 
             self.heatmaps[i].matrix = pad(tensor_heatmap)
             # matrix_numpy = self.heatmaps[0].matrix.numpy()
-            matrix_hei = len(self.heatmaps[i].matrix)  # 再次padding使得大小为321*321
+            matrix_hei = len(self.heatmaps[i].matrix)  # Padding again to make the size 321 * 321
             matrix_wid = len(self.heatmaps[i].matrix[0])
-            # aircraft
+            
             if matrix_hei < 320:
                 gap_h = 320 - matrix_hei
                 final_top_pd = torch.nn.ZeroPad2d(padding=(0, 0, gap_h, 0))
@@ -237,11 +237,10 @@ class Big_HeatMap41Pic:
                 sum += big_heatmaps[i + 1].matrix
             # print(len(sum))
         self.sum_matrix = sum
-        # matrix_numpy = sum.numpy()  # 测试保存至文件查看求和结果
-        # np.savetxt(save_path, matrix_numpy, fmt='%0.1f ')
+        
         return sum
 
-    def Get_MUL_maskANDheatmap(self, masked_labels_matrix):  # 将得到的点标签掩膜张量与此图的对应预测框热图张量的求和每个元素相乘（与）
+    def Get_MUL_maskANDheatmap(self, masked_labels_matrix):  # Multiply the sum of the obtained point label mask tensor and the corresponding predicted box heatmap tensor for each element
         masked_heatmaps_matrix = []
         for i in range(len(masked_labels_matrix)):
             # print(len(masked_labels_matrix))
@@ -254,12 +253,7 @@ class Big_HeatMap41Pic:
     def box_Location_predict_j(self, j, M_x, R, sum, centroid_x, m_axis_x):
         while j < (centroid_x):
             sum += m_axis_x[j]
-            # if count==2:
-            #     if sum >= M_x / 2 * (0.2-(math.log10(ave_anchors_lenth/16))/3):
-            #         break
-            # else:
-            #     if sum >= M_x / 2 * 0.1:
-            #         break
+   
             if sum >= (M_x / 2) * R:
                 break
             j += 1
@@ -270,12 +264,7 @@ class Big_HeatMap41Pic:
         while k > centroid:
             if flag==0:
                 sum += m_axis_x[k - 1]
-                # if count==2:
-                #     if sum >= M_x / 2 * (0.8+(math.log10(ave_anchors_lenth/16))/3):
-                #         break
-                # else:
-                #     if sum >= M_x/2 * 0.9:
-                #         break
+           
                 if sum >= (M_y / 2) * R:
                     break
                 k -= 1
@@ -284,7 +273,7 @@ class Big_HeatMap41Pic:
 
     def Get_Centroid(self, masked_heatmaps_matrix, rough_labels, count, ave_anchors_width, ave_anchors_height, R,
                      id, num, sequence, Inference_labels_thiPic, w_list, maskArea_list_x,
-                     maskArea_list_y):  # 得到每个标记点对应掩膜张量的重心及边框
+                     maskArea_list_y):  # Obtain the centroid and border of the mask tensor corresponding to each marker point
         # print(rough_labels)
         # device = torch.device('cuda' if torch.cuda.is_available else 'cpu')
         pred_labels_in1pic = torch.zeros([num, 5])
@@ -295,7 +284,7 @@ class Big_HeatMap41Pic:
         Area_list_num = -1
 
         for i in range(num):
-            # 找到此时处理的点的对应的point_label中心点
+            # Find the corresponding point_1abel center point for the point being processed at this time
             for seek in range(rough_labels_bullseye, len(rough_labels)):
                 rough_labels_bullseye += 1
                 if int(float(rough_labels[seek][0])) == int(float(id)):
@@ -304,9 +293,8 @@ class Big_HeatMap41Pic:
                     rough_labels_y = float(rough_labels[seek][2]) / 2
 
                     break
-            # print('第', i,'个')
-            # print('f(get_centroidi) 第i个:',i)
-            m_axis_x = torch.sum(masked_heatmaps_matrix[i], dim=0)  # dim=0是列  此句得到列上的求和一维数组
+            
+            m_axis_x = torch.sum(masked_heatmaps_matrix[i], dim=0) 
             m_axis_y = torch.sum(masked_heatmaps_matrix[i], dim=1)
             # b=m_axis_y
             # a=m_axis_x
@@ -323,7 +311,7 @@ class Big_HeatMap41Pic:
             #     f.close()
             M_x = torch.sum(m_axis_x)
             # aircraft
-            centroid_x = torch.sum(m_axis_x.mul(torch.arange(0, 320, 1))) / (M_x + 0.000001)  # 得到列上对应元素与坐标乘积的和除以列上的总质量
+            centroid_x = torch.sum(m_axis_x.mul(torch.arange(0, 320, 1))) / (M_x + 0.000001)  # Obtain the sum of the products of the corresponding elements on the column and their coordinates, divided by the total mass on the column
             if (centroid_x == 0):
                 centroid_x = float(rough_labels_x)
             # print("x: ",centroid_x)
@@ -338,13 +326,13 @@ class Big_HeatMap41Pic:
             pred_labels_in1pic[i][2] = centroid_y
             # print('M_x',M_x)
             # print('M_y ',M_y)
-            if M_x < 10:  # 如果此点标记点没有热图张量，则指定其框
+            if M_x < 10:  # If this point marker does not have a heatmap tensor, specify its box
 
                 pred_labels_in1pic[i][3] = Get_Perspective_Average_Distance(ave_anchors_width, 0,
                                                                             Inference_labels_thiPic, id, rough_labels_y*2,
                                                                             w_list,0)/2
             else:
-                if centroid_x % 10 == 0:  # 取余数
+                if centroid_x % 10 == 0:  # Take remainder
                     j = 0
                     sum = 0.0
                     while j < (centroid_x):
@@ -365,13 +353,6 @@ class Big_HeatMap41Pic:
                     flag = 0
                     check = 0
                     hit = 0
-                    # for m in range(len(m_axis_x)):
-                    #     if m_axis_x[m] >= 1000:
-                    #         flag = 1
-                    #         check += 1
-                    #         hit = check
-                    #     else:
-                    #         check += 1
                     k = self.box_Location_predict_k(centroid_x,check, flag,  hit, k, M_x, R, sum, m_axis_x)
                     # lright = k
                     # print("lright",lright)
@@ -388,18 +369,10 @@ class Big_HeatMap41Pic:
                     flag=0
                     check=0
                     hit=0
-
-                    # for m in range(len(m_axis_x)):
-                    #     if m_axis_x[m]>=1000:
-                    #         flag=1
-                    #         check+=1
-                    #         hit= check
-                    #     else:
-                    #         check+=1
                     k = self.box_Location_predict_k(centroid_x, check, flag, hit, k, M_x, R, sum, m_axis_x)
                     # lright=k
                     # print("lright",lright)
-                if M_x == 0:  # 如果点标记点没有热图张量，则指定其框
+                if M_x == 0:  # If the marked point does not have a heatmap tensor, specify its box
                     pred_labels_in1pic[i][3] = Get_Perspective_Average_Distance(ave_anchors_width, 0,
                                                                                 Inference_labels_thiPic, id,
                                                                                 rough_labels_y*2, w_list,0) / 2
@@ -416,7 +389,7 @@ class Big_HeatMap41Pic:
                     pred_labels_in1pic[i][3] = (k - j)
                 # print(pred_labels_in1pic[i][2])
 
-            if M_y <10:  # 如果此点标记点没有热图张量，则指定其框
+            if M_y <10:  
 
                 pred_labels_in1pic[i][4] = Get_Perspective_Average_Distance(ave_anchors_height, 1,
                                                                             Inference_labels_thiPic, id, rough_labels_y*2,
@@ -437,9 +410,6 @@ class Big_HeatMap41Pic:
                     k = self.box_Location_predict_k(centroid_y, check, flag, hit, k, M_y, R, sum, m_axis_y)
                     # ldown = k
                     # print("ldown",ldown)
-
-                    # aircraft h
-
                 else:
 
                     j = 0
@@ -457,7 +427,7 @@ class Big_HeatMap41Pic:
                     k = self.box_Location_predict_k(centroid_y, check, flag, hit, k, M_y, R, sum, m_axis_y)
                     # ldown = k
                     # print("ldown",ldown)
-                if M_y == 0:  # 如果此点标记点没有热图张量，则指定其框
+                if M_y == 0:  # If this point marker does not have a heatmap tensor, specify its box
                     pred_labels_in1pic[i][4] = Get_Perspective_Average_Distance(ave_anchors_height, 1,
                                                                                 Inference_labels_thiPic, id,
                                                                                 rough_labels_y*2, w_list,0)/2
@@ -466,7 +436,7 @@ class Big_HeatMap41Pic:
                     pred_labels_in1pic[i][4] = Get_Perspective_Average_Distance(ave_anchors_height, 1,
                                                                                 Inference_labels_thiPic, id,
                                                                                 rough_labels_y*2, w_list,0)/2
-                if ((k-j)/maskArea_list_y[Area_list_num]<0.1):     #如果此点实例预测不合理，修正为PDA
+                if ((k-j)/maskArea_list_y[Area_list_num]<0.1):     #If the instance prediction at this point is unreasonable, correct it to PDA
                     pred_labels_in1pic[i][4] = Get_Perspective_Average_Distance(ave_anchors_height, 1,
                                                                                 Inference_labels_thiPic, id,
                                                                                 rough_labels_y*2, w_list,0)/2
@@ -494,14 +464,7 @@ class Big_HeatMap41Pic:
                 rough_labels[rough_labels_bullseye - 1][1]) / 2) / 320
             pred_labels_in1pic[i][2] = (random.uniform(-0.005, 0.005) + float(
                 rough_labels[rough_labels_bullseye - 1][2]) / 2) / 320
-            # pred_labels_in1pic[i][3] = Get_Perspective_Average_Distance(ave_anchors_width, 0,
-            #                                                             Inference_labels_thiPic, id,
-            #                                                             rough_labels_y * 2, w_list, 0) / 2 / 320
-            # pred_labels_in1pic[i][4] = Get_Perspective_Average_Distance(ave_anchors_width, 1,
-            #                                                             Inference_labels_thiPic, id,
-            #                                                             rough_labels_y * 2, w_list, 0) / 2 / 320
-            # pred_labels_in1pic[i][3] = ave_anchors_width /2/ 320
-            # pred_labels_in1pic[i][4] = ave_anchors_height /2/ 320
+
             if pred_labels_in1pic[i][3]/2 > rough_labels_x:
                 pred_labels_in1pic[i][3] = rough_labels_x*2
             if pred_labels_in1pic[i][4]/2 > rough_labels_y:
@@ -525,10 +488,10 @@ class Fake_label:
         self.label_area = 50
         self.hand_label_locationea = {0, 0}
 
-    def define_label_area(self):  # 定义标记点mask区域
+    def define_label_area(self):  # Define marker point mask area
         self.label_area = {50, 50}
 
-    def get_single_hand_centre_label(self, hand_label_location):  # 得到点标记
+    def get_single_hand_centre_label(self, hand_label_location):  # Get point markers
         self.hand_label_locationea = hand_label_location
 
 
@@ -547,7 +510,7 @@ def Open_txt(URL):
     return data
 
 
-def Get_Inference_Labels(data, height, width):  # 得到一张图中推断出的标签
+def Get_Inference_Labels(data, height, width):  # Obtain the inferred labels from a graph
     i = 0
     changed_data = []
 
@@ -609,7 +572,6 @@ def Write_val_Rough_Labels(labels, height, width):
 
 def Write_Rough_Labels(labels, height, width):
     i = 0
-
     # print(labels)
     folder_path = "./Rough_labels_generated"
     save_path = "./Rough_labels_generated/1.txt"
@@ -655,14 +617,6 @@ def Get_Rough_Labels(Rough_label_URL):
         # print(type(data[i][2]))
         i += 1
 
-    # while i<len(data):
-    #     label=data[i]
-    #     label=label.split(',')
-    #     changeddata[i].append(label[0])
-    #     changeddata[i].append(label[1])
-    #     changeddata[i].append(label[2])
-    #     i+=1
-
     return data
 
 
@@ -671,7 +625,6 @@ def Get_Rough_Labels(Rough_label_URL):
 def Get_id_Point_label(point_labels, id):
     flag = 0
     for i in range(len(point_labels)):
-        # 用于aircraft
         if point_labels[i][0] == id:
             flag += 1
             return point_labels[i]
@@ -688,24 +641,11 @@ class Masked_Matrix:
 
     def Get_Mask_Rough_Labels_Matrix_COCO(self, labels, ave_width, ave_height,
                                           id, class_id_list, w_list,
-                                          inference_labels):  # 给得到一张图片的标签做掩模图覆盖，标记中心点扩张,mask为动态：根据预测伪标签平均值
+                                          inference_labels):  # Cover the label of an image with a mask image, expand the center point of the label, and use a dynamic mask based on the predicted average pseudo label value
         # device = torch.device('cuda' if torch.cuda.is_available else 'cpu')
 
         masked_labels_matrix_list = []
 
-        # print(masked_labels_matrix)
-        # ave_mask_width = int(ave_mask_width)
-
-        # if int(ave_mask_width) % 2 == 0:
-        #     ave_mask_width = ave_mask_width + 0
-        # else:
-        #     ave_mask_width = ave_mask_width + 1
-        # if int(ave_mask_height) % 2 == 0:
-        #     ave_mask_height = ave_mask_height + 0
-        # else:
-        #     ave_mask_height = ave_mask_height + 1
-        # half_mask_lenth_width = int(ave_mask_width / 2)
-        # half_mask_lenth_height = int(ave_mask_height / 2)
         for i in range(len(labels)):
             if int(float(labels[i][0])) == int(float(id)):
 
@@ -717,7 +657,6 @@ class Masked_Matrix:
                                    w_list[3])/2
                 # ave_mask_width=int(ave_width)
                 # ave_mask_width = int(ave_mask_width)
-
                 ave_mask_width=int(ave_mask_width)
                 ave_mask_height = int(ave_mask_height)
                 if int(ave_mask_width) % 2 == 0:
@@ -730,7 +669,6 @@ class Masked_Matrix:
                     ave_mask_height = ave_mask_height + 1
                 half_mask_lenth_width = int(ave_mask_width / 2)
                 half_mask_lenth_height = int(ave_mask_height / 2)
-                # 用于aircraft
                 # if labels[i][0] == id:
                 mask_area = torch.ones([int(ave_mask_height), int(ave_mask_width)])
 
@@ -739,12 +677,11 @@ class Masked_Matrix:
                 top_pad = int((float(labels[i][2])) / 2) - half_mask_lenth_height
                 bottom_pad = 320 - (int((float(labels[i][2])) / 2) + half_mask_lenth_height)
                 pad = torch.nn.ZeroPad2d(padding=(left_pad, right_pad, top_pad, bottom_pad))
-                # 用于aircraft
                 mask_area = pad(mask_area)
 
-                matrix_hei = len(mask_area)  # 再次padding使得大小为321*321
+                matrix_hei = len(mask_area)  # Padding again to make the size 321 * 321
                 matrix_wid = len(mask_area[0])
-                # aircraft
+                
                 if matrix_hei > 320:
                     gap_h = matrix_hei - 320
                     final_top_pd = torch.nn.ZeroPad2d(padding=(0, 0, -gap_h, 0))
@@ -763,27 +700,6 @@ class Masked_Matrix:
                 self.maskArea_list_x.append(int(ave_mask_width))
                 self.maskArea_list_y.append(int(ave_mask_height))
                 masked_labels_matrix_list.append(mask_area)
-                # print("len(mask_labels_matrix）： ",len(masked_labels_matrix[i]))
-                # print(i,":",masked_labels_matrix[i])
-                # print(i,":  ",masked_labels_matrix[i],'\n')
-
-        # dif_bac = torch.zeros([len(labels), 2])
-        # print(dif_bac)
-        # i = 0
-        # while i < len(labels):  # 转换为浮点型
-        #     labels[i] = list(map(float, labels[i]))
-        #     i += 1
-        #
-        # labels = torch.tensor(labels)
-        # print(labels)
-        # mask_area = torch.cat([labels, dif_bac], 1)  # 合并张量
-        # print(mask_area)
-        #
-        # dif_area = 40
-        # i = 0
-        # while i < len(labels):  # 指定扩充大小
-        #
-        #     i += 1
 
         return masked_labels_matrix_list
 
@@ -795,10 +711,6 @@ def Change_File_Name_In1directrory(URL):
 
 
 def Get_Masked_bias_label(pseudo_labels, rough_labels):
-    # print(len(pseudo_labels))
-    # print(len(rough_labels))
-    # expand_stride=float(15/640)
-    # print(expand_stride)
 
     for i in range(len(rough_labels)):
         if len(rough_labels) == 0:
@@ -864,7 +776,7 @@ def Get_Final_PseudoBox_labels(Sparse_Generation_save_URL, point_labels_URL, Fin
     filenames.sort(key=lambda x: int(x[:-4]))
     folder_path = Final_save_URL  # 改3
     Rough_labels_root_URL = point_labels_URL
-    ALL_URL_Rough_labels = os.listdir(point_labels_URL)  # 点标记标签目录
+    ALL_URL_Rough_labels = os.listdir(point_labels_URL)  # Point tag label directory
     ALL_URL_Rough_labels.sort(key=lambda x: int(x[:-4]))
 
     for i in tqdm(range(len(filenames))):
@@ -887,9 +799,7 @@ def Get_Final_PseudoBox_labels(Sparse_Generation_save_URL, point_labels_URL, Fin
         # print(ave_rough_labels_lenth)
         pseudo_labels = Get_Masked_bias_label(labels_in_onePic, rough_labels_in_onePic)
 
-        # randNum_x = random.uniform(-(ave_rough_labels_lenth * 0.01), (
-        #         ave_rough_labels_lenth * 0.001))  # If you want to add some niose to the final generated sparse labels, increase the value.
-        # randNum_y = random.uniform(-(ave_rough_labels_lenth * 0.01), (ave_rough_labels_lenth * 0.001))
+    
         if not os.path.exists(folder_path):
             os.mkdir(folder_path)
         with open(save_path, 'w') as f:
@@ -906,7 +816,7 @@ def Get_Final_PseudoBox_labels(Sparse_Generation_save_URL, point_labels_URL, Fin
 
 
 def Update_w(w_list, val_labels_URL, inferenced_val_labels_URL):
-    root_url_rough = val_labels_URL  # 改4
+    root_url_rough = val_labels_URL  
     root_url_selected = inferenced_val_labels_URL
     All_url_rough = os.listdir(root_url_rough)
     All_url_rough.sort(key=lambda x: int(x[:-4]))
@@ -942,7 +852,7 @@ def Update_w(w_list, val_labels_URL, inferenced_val_labels_URL):
 predict_labels_num = 0
 
 
-# Id_InClass_Judge(id,class_list) 和 Seek_Class_Num_SinglePic(PointLabel_SinglePic)：80个类别，判断一张图片中有几个类别，返回类别数量。放在Write_Rough_Labels后
+# Id_InClass_Judge(id,class_list) and Seek_Class_Num_SinglePic(PointLabel_SinglePic)：80 categories in COCO, determine how many categories there are in an image, and return the number of categories. Placed after Write-Rought_Labels
 def Id_InClassList_Judge(id, class_list):
     i = 0
     while i < len(class_list):
@@ -992,7 +902,7 @@ class COCO_Heatmap_SgPic:
         self.id_List = []
         self.heatmap_List = []
 
-    def Get_MUL_maskANDheatmap(self, masked_labels_matrix, id):  # 将得到的点标签掩膜张量与此图的对应预测框热图张量的求和每个元素相乘（与）
+    def Get_MUL_maskANDheatmap(self, masked_labels_matrix, id):  # Multiply the sum of the obtained point label mask tensor and the corresponding predicted box heatmap tensor for each element
 
         masked_heatmaps_matrix = []
         for i in range(len(masked_labels_matrix)):
@@ -1048,7 +958,7 @@ def Set_NUll_PointObjct_Pic(Sparse_Generation_save_URL, txt_name):
 def Get_Ave_Class_lenth(class_id_list, inference_labels, w_list):
     for i in range(len(class_id_list)):
 
-        sum_box_width = 0  # 得到一张图片中每个类的预测框平均框宽度与高度
+        sum_box_width = 0  # Obtain the average width and height of the predicted boxes for each class in an image
         sum_box_height = 0
         num_of_id = 0
         for q in range(len(inference_labels)):
@@ -1081,7 +991,7 @@ def Get_Init_Heatmaps(big_heatmap, inference_labels, w_list):
         # print(m)
         heatmap1 = Heatmap()
 
-        heatmap1 = heatmap1.get_heatmap_matrix(inference_labels[m])  # 初始化一个heatmap
+        heatmap1 = heatmap1.get_heatmap_matrix(inference_labels[m])  # Initialize a heatmap
 
         matrix_x = heatmap1.matrix_w
         matrix_y = heatmap1.matrix_h
@@ -1100,7 +1010,7 @@ def Get_Init_Heatmaps(big_heatmap, inference_labels, w_list):
 
 
 def Get_Perspective_Average_Distance(class_ave, xORy, Inference_labels_singlePic, class_id, this_point_label_y,
-                                     w_list, MaskOrWidth):  # 透视加权平均距离
+                                     w_list, MaskOrWidth):  # Perspective weighted average distance
     gap = 10
     ave_gap_up = 0
     gap_count_up = 0
@@ -1110,7 +1020,7 @@ def Get_Perspective_Average_Distance(class_ave, xORy, Inference_labels_singlePic
     if MaskOrWidth == 0:
         for i in range(len(Inference_labels_singlePic)):
             if int(float(Inference_labels_singlePic[i][0])) == int(float(class_id)):
-                inf_labels_id_list.append(float(Inference_labels_singlePic[i][2]))  # 透视距离排序
+                inf_labels_id_list.append(float(Inference_labels_singlePic[i][2]))  # Perspective distance sorting
         inf_labels_id_list.sort()
         if len(inf_labels_id_list) != 0:
             distance_range = (float(inf_labels_id_list[len(inf_labels_id_list) - 1])) - float(inf_labels_id_list[0])
@@ -1146,8 +1056,8 @@ def Get_Perspective_Average_Distance(class_ave, xORy, Inference_labels_singlePic
                 ave_gap_down = (ave_gap_down) / gap_count_down
                 # class_ave = (ave_gap_up + ave_gap_down) / 2
 
-                # gradient = (class_ave - ave_gap_up)*2 / distance_range  # 透视距离梯度
-                gradient = (ave_gap_down - ave_gap_up) / distance_range
+                # gradient = (class_ave - ave_gap_up)*2 / distance_range  
+                gradient = (ave_gap_down - ave_gap_up) / distance_range   # Perspective distance gradient
                 bullseye = (float(inf_labels_id_list[0]) + float(inf_labels_id_list[len(inf_labels_id_list) - 1])) / 2
 
                 ave_PDA = ((float(this_point_label_y) - inf_labels_id_list[0]) * gradient + ave_gap_up) * w_list[2]
@@ -1174,7 +1084,7 @@ def Get_Random_PointLabels(Point_labels_SgPic, class_id_list):
     # for x in range(len(class_id_list)):
     #     for z in range(len(Point_labels_SgPic)):
     #         if Point_labels_SgPic[z][0] == class_id_list[x].class_name:
-    # ave_PDA_width = Perspective_Average_Distance(class_id_list[x].anchor_width, Point_labels_SgPic,      #得到透视平均距离
+    # ave_PDA_width = Perspective_Average_Distance(class_id_list[x].anchor_width, Point_labels_SgPic,      #Obtain the average perspective distance
     #                                              class_id_list[x].class_name, Point_labels_SgPic[z])
     # ave_PDA_height = Perspective_Average_Distance(class_id_list[x].anchor_height, Point_labels_SgPic,
     #                                               class_id_list[x].class_name, Point_labels_SgPic[z])
@@ -1190,10 +1100,9 @@ def Test(w_list, inferenced_labels_URL, Sparse_Generation_save_URL, point_labels
     round = 1
     epoch = 1
     ALL_URL_Labels_Inferenced = os.listdir(inferenced_labels_URL)
-    # 排序使得其读取为顺序
-    ALL_URL_Labels_Inferenced.sort(key=lambda x: int(x[:-4]))  # 排序使得其读取为顺序
+    ALL_URL_Labels_Inferenced.sort(key=lambda x: int(x[:-4]))  # Sort to read in order
 
-    # 点标记标签目录
+    # Point label directory
     ALL_URL_Rough_labels = os.listdir(point_labels_URL)
 
     ALL_URL_Rough_labels.sort(key=lambda x: int(x[:-4]))
@@ -1211,32 +1120,32 @@ def Test(w_list, inferenced_labels_URL, Sparse_Generation_save_URL, point_labels
             global predict_labels_num
             inference_labels = Get_Inference_Labels(Open_txt(URL_Inference), 576, 640)
 
-            URL_Rough_Label_Generated = './Rough_labels_generated/1.txt'  # 得到一张图片中的id_List
+            URL_Rough_Label_Generated = './Rough_labels_generated/1.txt'  # Obtain the id_List in an image
             Write_Rough_Labels(Open_txt(URL_For_Genert_RoughLabels), 576, 640)
             Point_labels_SgPic = Get_Rough_Labels(URL_Rough_Label_Generated)
             class_id_list = Seek_Class_List_SinglePic(Point_labels_SgPic)
             if class_id_list[0] == 0:
                 Set_NUll_PointObjct_Pic(Sparse_Generation_save_URL, ALL_URL_Rough_labels[count])
                 if ALL_URL_Labels_Inferenced[count_Forinference_URL] == ALL_URL_Rough_labels[
-                    count]:  # 是否为对应图片预测，否则此图预测结果为空
+                    count]:  # Is it predicted for the corresponding image, Otherwise, the predicted result for this image is empty
                     count_Forinference_URL += 1
                 continue
 
-            if ALL_URL_Labels_Inferenced[count_Forinference_URL] == ALL_URL_Rough_labels[count]:  # 是否为对应图片预测，否则此图预测结果为空
+            if ALL_URL_Labels_Inferenced[count_Forinference_URL] == ALL_URL_Rough_labels[count]:  # 
                 count_Forinference_URL += 1
 
-                class_id_list = Get_Ave_Class_lenth(class_id_list, inference_labels, w_list)  # 得到一张图中平均每个类的预测框长度
-                # Point_labels_SgPic = Get_Random_PointLabels(Point_labels_SgPic,class_id_list)  # 得到随机位置的点标注数据，需修改
+                class_id_list = Get_Ave_Class_lenth(class_id_list, inference_labels, w_list)  # Obtain the average predicted box length for each class in a graph
+                # Point_labels_SgPic = Get_Random_PointLabels(Point_labels_SgPic,class_id_list)  
 
                 coco_Heatmap_sgpic.id_List = class_id_list
                 big_heatmap = Big_HeatMap41Pic()
-                big_heatmap = Get_Init_Heatmaps(big_heatmap, inference_labels, w_list)  # 初始化此张图所有预测框为张量
+                big_heatmap = Get_Init_Heatmaps(big_heatmap, inference_labels, w_list)  # Initialize all predicted boxes in this image as tensors
 
-                big_heatmap = big_heatmap.Padding_heatmaps()  # 已得到所有映射张量，对单张图片中每个预测框张量padding为321*321
+                big_heatmap = big_heatmap.Padding_heatmaps()  # All mapping tensors have been obtained, and the padding for each predicted box tensor in a single image is 321 * 321
                 Sumed_Tensors_ID_List = []
 
                 for h in range(len(class_id_list)):
-                    temp_sum_matrix = big_heatmap.Sum_heatmaps(class_id_list[h].class_name)  # 对单张图片中每个类的预测框张量求和
+                    temp_sum_matrix = big_heatmap.Sum_heatmaps(class_id_list[h].class_name)  # Sum up the predicted box tensors for each class in a single image
                     Sumed_Tensors_ID_List.append(temp_sum_matrix)
                 coco_Heatmap_sgpic.heatmap_List = Sumed_Tensors_ID_List
 
@@ -1249,11 +1158,11 @@ def Test(w_list, inferenced_labels_URL, Sparse_Generation_save_URL, point_labels
                         class_id_list[i].anchor_height,
                         class_id_list[
                             i].class_name, class_id_list, w_list,
-                        inference_labels)  # 得到一张图片中每个标记点的掩膜张量
+                        inference_labels)  # Obtain the mask tensor for each marker point in an image
 
                     masked_heatmaps_matrix = coco_Heatmap_sgpic.Get_MUL_maskANDheatmap(
                         masked_labels_matrixes.masked_labels_matrix_list, i)
-                    # 一张图片中每个掩膜张量与整个此张图的热图张量相乘得到每个点标记点范围内对应的张量
+                    # Multiplying each mask tensor in an image with the heatmap tensor of the entire image yields the tensor corresponding to each point within the labeled range
 
                     labels_List.append(
                         big_heatmap.Get_Centroid(masked_heatmaps_matrix, Point_labels_SgPic, round,
@@ -1297,7 +1206,7 @@ def Test(w_list, inferenced_labels_URL, Sparse_Generation_save_URL, point_labels
     return w_list
 
 
-def Get_Mask_Rough_Labels_Matrix(labels, ave_mask_lenth):  # 给得到一张图片的标签做掩模图覆盖，简单标记中心点扩张,mask为动态：根据预测伪标签平均值
+def Get_Mask_Rough_Labels_Matrix(labels, ave_mask_lenth):  # Cover the label of an image with a mask image, simply mark the center point for expansion, and use a dynamic mask based on the predicted average pseudo label value
     masked_labels_matrix = [0] * len(labels)
     # print(masked_labels_matrix)
     ave_mask_lenth = int(ave_mask_lenth)
@@ -1307,14 +1216,13 @@ def Get_Mask_Rough_Labels_Matrix(labels, ave_mask_lenth):  # 给得到一张图�
         ave_mask_lenth = ave_mask_lenth + 1
     half_mask_lenth = int(ave_mask_lenth / 2)
     for i in range(len(labels)):
-        # 用于aircraft
         mask_area = torch.ones([int(ave_mask_lenth), int(ave_mask_lenth)])
         left_pad = int((float(labels[i][1])) / 2) - half_mask_lenth
         right_pad = 320 - (int((float(labels[i][1])) / 2) + half_mask_lenth)
         top_pad = int((float(labels[i][2])) / 2) - half_mask_lenth
         bottom_pad = 320 - (int((float(labels[i][2])) / 2) + half_mask_lenth)
         pad = torch.nn.ZeroPad2d(padding=(left_pad, right_pad, top_pad, bottom_pad))
-        # 用于aircraft
+       
         mask_area = pad(mask_area)
         masked_labels_matrix[i] = mask_area
 
@@ -1326,17 +1234,12 @@ def Test_val(w_list, inferenced_labels_URL, Sparse_Generation_save_URL, point_la
     round = 1
     epoch = 1
 
-    # ALL_URL_Labels_Inferenced=os.listdir('./')      #
-    # ALL_URL_Labels_Inferenced = os.listdir('./')         #        改1
     ALL_URL_Labels_Inferenced = os.listdir(inferenced_labels_URL)
-    # ALL_URL_Labels_Inferenced = os.listdir('./')
-    # ALL_URL_Labels_Inferenced.sort(key=lambda x:int(x[:-4].lstrip('1 ').lstrip('(').rstrip(')')))   #排序使得其读取为顺序
-    ALL_URL_Labels_Inferenced.sort(key=lambda x: int(x[:-4]))  # 排序使得其读取为顺序
-    # print(ALL_URL_Labels_Inferenced[0])
 
-    # ALL_URL_Rough_labels=os.listdir('./')    #点标记标签目录
+    ALL_URL_Labels_Inferenced.sort(key=lambda x: int(x[:-4]))  # Sort to read in order
+
+    # ALL_URL_Rough_labels=os.listdir('./')    #Point label directory
     ALL_URL_Rough_labels = os.listdir(point_labels_URL)
-    # ALL_URL_Rough_labels.sort(key=lambda x:int(x[:-4].lstrip('1 ').lstrip('(').rstrip(')')))
     ALL_URL_Rough_labels.sort(key=lambda x: int(x[:-4]))
     # print(ALL_URL_Rough_labels)
     labels_save_path = Sparse_Generation_save_URL
@@ -1348,14 +1251,14 @@ def Test_val(w_list, inferenced_labels_URL, Sparse_Generation_save_URL, point_la
 
             coco_Heatmap_sgpic = COCO_Heatmap_SgPic()
             # print()
-            URL_Inference = inferenced_labels_URL + ALL_URL_Labels_Inferenced[count_Forinference_URL]  # 改2
+            URL_Inference = inferenced_labels_URL + ALL_URL_Labels_Inferenced[count_Forinference_URL]
             # print(URL_Inference)
             URL_For_Genert_RoughLabels = point_labels_URL + ALL_URL_Rough_labels[count]
             # Rough_labels=Get_Rough_Labels(Open_txt(URL_Rough_Label))
             global predict_labels_num
             inference_labels = Get_Inference_Labels(Open_txt(URL_Inference), 576, 640)
 
-            URL_Rough_Label_Generated = './Rough_labels_generated/1.txt'  # 得到一张图片中的id_List
+            URL_Rough_Label_Generated = './Rough_labels_generated/1.txt' # Obtain the id_List in an image
             Write_Rough_Labels(Open_txt(URL_For_Genert_RoughLabels), 576, 640)
             Point_labels_SgPic = Get_Rough_Labels(URL_Rough_Label_Generated)
             class_id_list = Seek_Class_List_SinglePic(Point_labels_SgPic)
@@ -1365,11 +1268,11 @@ def Test_val(w_list, inferenced_labels_URL, Sparse_Generation_save_URL, point_la
             # print(inference_labels[0][1])
 
             # print("processed_labels_num: ", predict_labels_num)
-            if ALL_URL_Labels_Inferenced[count_Forinference_URL] == ALL_URL_Rough_labels[count]:  # 是否为对应图片预测，否则此图预测结果为空
+            if ALL_URL_Labels_Inferenced[count_Forinference_URL] == ALL_URL_Rough_labels[count]:  # Is it predicted for the corresponding image, Otherwise, the predicted result for this image is empty
                 count_Forinference_URL += 1
                 for i in range(len(class_id_list)):
 
-                    sum_box_width = 0  # 得到一张图片中每个类的预测框平均框宽度与高度
+                    sum_box_width = 0  # Obtain the average width and height of the predicted boxes for each class in an image
                     sum_box_height = 0
                     for q in range(len(inference_labels)):
                         if float(inference_labels[q][0]) == float(class_id_list[i].class_name):
@@ -1393,7 +1296,7 @@ def Test_val(w_list, inferenced_labels_URL, Sparse_Generation_save_URL, point_la
                     # print(m)
                     heatmap1 = Heatmap()
 
-                    heatmap1 = heatmap1.get_heatmap_matrix(inference_labels[m])  # 初始化一个heatmap
+                    heatmap1 = heatmap1.get_heatmap_matrix(inference_labels[m])  # Initialize a heatmap
 
                     matrix_x = heatmap1.matrix_w
                     matrix_y = heatmap1.matrix_h
@@ -1408,28 +1311,16 @@ def Test_val(w_list, inferenced_labels_URL, Sparse_Generation_save_URL, point_la
                     # print(heatmap1.matrix)
                     big_heatmap.heatmaps.append(heatmap1)
                     m += 1
-                big_heatmap = big_heatmap.Padding_heatmaps()  # 已得到所有映射张量，对单张图片中每个预测框张量padding为321*321
+                big_heatmap = big_heatmap.Padding_heatmaps()  # All mapping tensors have been obtained, and the padding for each predicted box tensor in a single image is 321 * 321
                 # Point_labels_SgPic = Open_txt(URL_For_Genert_RoughLabels)
                 # class_id_list=Seek_Class_List_SinglePic(Point_labels_SgPic)
                 Sumed_Tensors_ID_List = []
 
                 for h in range(len(class_id_list)):
-                    temp_sum_matrix = big_heatmap.Sum_heatmaps(class_id_list[h].class_name)  # 对单张图片中每个类的预测框张量求和
+                    temp_sum_matrix = big_heatmap.Sum_heatmaps(class_id_list[h].class_name)  # Sum up the predicted box tensors for each class in a single image
                     Sumed_Tensors_ID_List.append(temp_sum_matrix)
                 coco_Heatmap_sgpic.heatmap_List = Sumed_Tensors_ID_List
-                # print(big_heatmap.sum_matrix)
-
-                # i = 0
-                # while i < len(big_heatmap.heatmaps):
-                #     # print(big_heatmap.heatmaps[i].matrix)
-                #     i += 1
-
-                # URL_For_Genert_RoughLabels = './'
-
-                # URL_Rough_Label_Generated = './Rough_labels_generated/1.txt'
-                # URL_Rough_Label='.//'+ALL_URL_Rough_labels[0]
-
-                # Write_Rough_Labels(Point_labels_SgPic, 576, 640)
+        
                 labels_List = []
                 for i in range(len(class_id_list)):
 
@@ -1438,10 +1329,10 @@ def Test_val(w_list, inferenced_labels_URL, Sparse_Generation_save_URL, point_la
                     masked_labels_matrixes.masked_labels_matrix_list = masked_labels_matrixes.Get_Mask_Rough_Labels_Matrix_COCO(
                         Point_labels_SgPic, ave_mask_lenth,
                         class_id_list[
-                            i].class_name)  # 得到一张图片中每个标记点的掩膜张量
+                            i].class_name)  # Obtain the mask tensor for each marker point in an image
 
                     masked_heatmaps_matrix = coco_Heatmap_sgpic.Get_MUL_maskANDheatmap(masked_labels_matrixes,
-                                                                                       i)  # 一张图片中每个掩膜张量与整个此张图的热图张量相乘得到每个点标记点范围内对应的张量
+                                                                                       i)  # Multiplying each mask tensor in an image with the heatmap tensor of the entire image yields the tensor corresponding to each point within the labeled range
                     # print(masked_heatmaps_matrix)
                     labels_List.append(
                         big_heatmap.Get_Centroid(masked_heatmaps_matrix, Point_labels_SgPic, round,
@@ -1463,25 +1354,8 @@ def Test_val(w_list, inferenced_labels_URL, Sparse_Generation_save_URL, point_la
                             f.write(str(int(labels_List[i][q][0])) + ' ' + str(labels_List[i][q][1]) + ' ' + str(
                                 labels_List[i][q][2]) + ' ' + str(labels_List[i][q][3]) + ' ' + str(
                                 labels_List[i][q][4]) + '\n')
-                # labels = labels.div(320)
-                # aircraft
-                # labels=labels.numpy()
-                # for i in range(len(labels)):
-                #     labels[i][0]=int(labels[i][0])
-
-                # print(labels)
             else:
                 Set_NUll_InfObjct_Pic(Point_labels_SgPic, Sparse_Generation_save_URL, ALL_URL_Rough_labels[count])
-
-            # save_path = labels_save_path + ALL_URL_Rough_labels[count]
-            # if not os.path.exists(labels_save_path):
-            #     os.mkdir(labels_save_path)
-            # with open(save_path, 'w') as f:
-            #     for i in range(len(labels_List)):
-            #         for q in range(len(labels_List[i])):
-            #             f.write(str(int(labels_List[i][q][0])) + ' ' + str(labels_List[i][q][1]) + ' ' + str(
-            #                 labels_List[i][q][2]) + ' ' + str(labels_List[i][q][3]) + ' ' + str(
-            #                 labels_List[i][q][4]) + '\n')
 
         time.sleep(0.1)
 
@@ -1491,7 +1365,6 @@ def Test_val(w_list, inferenced_labels_URL, Sparse_Generation_save_URL, point_la
 
     return w_list
 
-
 def TEST2():
     URL_Inference = './'
     URL_Gene_RoughLabels = './'
@@ -1499,7 +1372,6 @@ def TEST2():
     Write_Rough_Labels(Open_txt(URL_Gene_RoughLabels), 640, 640)
     Rough_labels = Get_Rough_Labels(URL_Rough_Label)
     i = 0
-    # masked_labels_matrix=Get_Mask_Rough_Labels_Matrix(Rough_labels)        #得到一张图片中每个标记点的掩膜张量
 
 
 def Test3():
@@ -1567,7 +1439,7 @@ def Get_Max_Conf_labels():
     filenames.sort(key=lambda x: int(x[:-4].lstrip('1 ').lstrip('(').rstrip(')')))
     folder_path = './/'
     Rough_labels_root_URL = './/'
-    # ALL_URL_Rough_labels = os.listdir('./')  # 点标记标签目录
+    # ALL_URL_Rough_labels = os.listdir('./')  # Point label directory
     ALL_URL_Rough_labels = os.listdir('./')
     ALL_URL_Rough_labels.sort(key=lambda x: int(x[:-4].lstrip('1 ').lstrip('(').rstrip(')')))
 
@@ -1584,7 +1456,7 @@ def Get_Max_Conf_labels():
         for m in range(len(rough_label)):
             new2_label = rough_label[m].split(' ')
             rough_labels_in_onePic.append(new2_label)
-        # print(i,': ')
+            
         max_labels = Get_Masked_label(labels_in_onePic, rough_labels_in_onePic)
 
         if not os.path.exists(folder_path):
@@ -1595,15 +1467,12 @@ def Get_Max_Conf_labels():
 
                 f.write(new_label[0] + ' ' + new_label[1] + ' ' + new_label[2] + ' ' + new_label[3] + ' ' + new_label[
                     4] + '\n')
-        # print('max_conf_labels in file',i,':',len(max_labels))
-        # print('point_labels in file',i,':',len(rough_label))
-        # print()
 
 
 def Begin_Update(epoch, w_list):
     for i in range(epoch):
         print("epoch: ", i + 1)
-        w_list = Update_w(w_list)  # 更新参数
+        w_list = Update_w(w_list)  # Update Parameters
     return w_list
 
 
@@ -1611,7 +1480,7 @@ def main(inferenced_labels_URL, Sparse_Generation_save_URL, val_labels_URL, infe
          Sparse_generation_val_labels_save_URL, point_labels_URL, epochs, Final_save_URL):
     num = 0
     if num == 0:
-        R_w1 = 0.02  # 参数
+        R_w1 = 0.02  # initial parameter
         staircase_w2 = 0.75
         avepseudobbox_lenth_w3 = 1.0
         masklenth_w4 = 1.0
