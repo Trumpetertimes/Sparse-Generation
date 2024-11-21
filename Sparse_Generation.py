@@ -1,28 +1,19 @@
-## 1.  Only need to use a very small set of supervised annotation data(like 8 pictures depends on the dataset) to Train a pre-model, use this pre-trained model to predict the pseudo labels on entire dataset.
-##
+# copyright: @Trumpetertimes(Siu hamburger) github: https://github.com/Trumpetertimes/Sparse_Generation
+# This work is supported by: This work was supported by the National Key R\&D program of China (2022ZD0119005), and National Key Laboratory of Spatial Intelligent Control Technology (HTKJ2024KL502027).
+## 1.  Only need to use a small set of supervised annotation data to train a pre-model, use this pre-trained model to predict the pseudo labels on entire dataset.
 ## 2. "point_labels_URL" is the folder path to put the Point-annotation data.
-
 ## 3. "inferenced_labels_URL" is the folder path to put predicted pseudo labels.
-
 ## 4. "Sparse_Generation_save_URL" is the output derictory of Sparse Generation, which in yolo txt format for easy to demonstration.
-
 ## 5. "Final_save_URL" is the final output derictory of Sparse Generation.
-
 ## 6. "epochs" is to set the epochs for parameter updating.
-
 ## 7. "val_labels_URL" is the folder path to put the small amount supervised labels.
-
 ## 8. "inferenced_val_labels_URL" is to set the path which pseudo labels predicted from the small amount supervised pictures.
-
-
 ##  If your detector model output the COCO json or VOC format annotation, transforming them to yolo txt format.
-
 ##  The other initial parameters were already set.
 
 import argparse
 import random
 import time
-
 import cv2 as cv2
 import os
 import numpy as np
@@ -105,10 +96,9 @@ class Heatmap:
         else:
             scale_small = center_x
             scale_big = center_y
-        # print('中心点： ',center_x,' ',center_y)
+        
         distance = math.sqrt((center_x - y) * (center_x - y) + (center_y - x) * (center_y - x))
-        # print('此点距离: ',distance)
-        # print('scale_big: ',scale_big)
+
         if distance <= scale_small:
             if distance == 0:
                 self.matrix[x, y] = 1
