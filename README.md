@@ -1,6 +1,6 @@
 # Sparse Generation: Making Pseudo Labels Sparse for point weakly supervised object detection on low data volume
 
-![image](https://github.com/Trumpetertimes/Sparse_Generation/blob/master/SP_pipeline0912.png)
+
 Sparse Generation uses non-networked approach and direct regression on pseudo labels. In three processing stages (Mapping, Mask, Regression), Sparse Generation constructs initial tensors through the relationship between data and detector model, optimizes its parameters, and obtains a sparse tensor, addresses the model’s density problem on low data volume. 
 
 
@@ -22,7 +22,6 @@ SIMD dataset (https://github.com/ihians/simd.git)
 Only need to use a small set of supervised annotation data to train a pre-model, use this pre-trained model to predict the pseudo labels on entire dataset.
 We validated on four different datasets(MS COCO-5000, RSOD, SIMD, Bullet-Hole).
 
-![image](https://github.com/Trumpetertimes/Sparse_Generation/blob/master/SPexperiment0912.png)
 
 If your detector model output the COCO json or VOC format annotation, transforming them to yolo txt format. 
 
