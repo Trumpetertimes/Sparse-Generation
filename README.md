@@ -22,8 +22,16 @@ SIMD dataset (https://github.com/ihians/simd.git)
 Only need to use a small set of supervised annotation data to train a pre-model, use this pre-trained model to predict the pseudo labels on entire dataset.
 We validated on four different datasets(MS COCO-5000, RSOD, SIMD, Bullet-Hole).
 
+### pre-trained weights
+The pre-trained weights for yolov5s on MS COCO-5000, RSOD-aircraft, RSOD-oiltank, SIMD:
 
-If your detector model output the COCO json or VOC format annotation, transforming them to yolo txt format. 
+https://pan.baidu.com/s/1eXfbLB0-NRaVXk4xe1oo8w?pwd=abcd
+
+
+**using the pre-trained weights we provided, or you can train your own pre-trained weights.**
+
+### Prediction and generation pseudo labels
+If your detector model output the COCO json or VOC format annotation, transforming them to yolo txt format. Using Sparse Generation to generate pseudo labels predicted by the detector.
 
    The initial parameters were already set. run command:
     
