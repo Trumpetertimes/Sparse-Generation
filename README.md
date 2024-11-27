@@ -31,6 +31,11 @@ https://pan.baidu.com/s/1eXfbLB0-NRaVXk4xe1oo8w?pwd=abcd
 **using the pre-trained weights we provided, or you can train your own pre-trained weights.**
 
 ### Prediction and generation pseudo labels
+
+Example for prediction using yolov5s:
+
+    python detect.py --weights 'your weights' --source 'image directory path' --save-txt
+
 If your detector model output the COCO json or VOC format annotation, transforming them to yolo txt format. Using Sparse Generation to generate pseudo labels predicted by the detector.
 
    The initial parameters were already set. run command:
