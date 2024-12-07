@@ -38,7 +38,7 @@ put the original box labels of train set to point labels derictory, the code wil
 
 Example for prediction using yolov5s:
 
-    python detect.py --weights 'your weights' --source 'image directory path' --save-txt
+    python detect.py --weights 'your weights' --source 'image directory path' --save-txt --nosave
 
 If your detector model output the COCO json or VOC format annotation, transforming them to yolo txt format. Using Sparse Generation to generate pseudo labels predicted by the detector.
 
