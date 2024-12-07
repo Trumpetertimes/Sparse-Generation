@@ -1489,7 +1489,7 @@ def main(inferenced_labels_URL, Sparse_Generation_save_URL, val_labels_URL, infe
 
     print("w1:", w_list[0], "  w2:", w_list[1], "  w3:", w_list[2], "  w4:", w_list[3])
     print()
-    print("Sparse pseudo labels were saved in: ", Final_save_URL)
+    print("Sparse pseudo labels were saved in: ", Sparse_Generation_save_URL)
 
 
 def parse_your_individual_data():
