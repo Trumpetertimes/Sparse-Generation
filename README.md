@@ -30,6 +30,10 @@ https://pan.baidu.com/s/1eXfbLB0-NRaVXk4xe1oo8w?pwd=abcd
 
 **using the pre-trained weights we provided, or you can train your own pre-trained weights.**
 
+### Point labels
+
+put the original box labels of train set to point labels derictory, the code will convert them to coarse point labels without manual intervention.
+
 ### Prediction and generation pseudo labels
 
 Example for prediction using yolov5s:
