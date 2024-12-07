@@ -899,6 +899,9 @@ class COCO_Heatmap_SgPic:
             # print(len(masked_labels_matrix))
             mid = self.heatmap_List[id].mul(masked_labels_matrix[i])
             b=mid.numpy()
+            path="./masked_matrix_check/"
+            if not os.path.exists(path):
+                os.makedirs(path)
             save_path = "./masked_matrix_check/" + str(id) + "_" +str(i)+".txt"
             with open(save_path, 'w') as f:
                 np.savetxt(save_path,b,fmt='%0.1f')
