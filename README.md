@@ -10,7 +10,7 @@ Sparse Generation uses non-networked approach and direct regression on pseudo la
     our cuda version is 11.6.
     
 ## Dataset:
-Due to the need to obtain instances as dense as possible, we conducted Bullet-Hole data set collection in a real shooting range.In these photos with the highest number of bullet holes contain over 600 bullet holes in a single picture. Link for downloading the pictures and annotations: (https://pan.baidu.com/s/1Qg-3FOer2x0TS55I9ZzEVQ?pwd=abcd).
+Due to the need to obtain instances as dense as possible, we conducted Bullet-Hole data set collection in a real shooting range.In these photos with the highest number of bullet holes contain over 600 bullet holes in a single picture. Link for downloading the pictures and annotations: (https://pan.baidu.com/s/1Qg-3FOer2x0TS55I9ZzEVQ?pwd=abcd). Note: Please remove the large images at full resolution during training, those pictures were not cropped neither used in training.
 
 The other datasets used in our experiment:
 MS COCO dataset (https://cocodataset.org/#download)
