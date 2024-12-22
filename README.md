@@ -32,7 +32,7 @@ https://pan.baidu.com/s/1eXfbLB0-NRaVXk4xe1oo8w?pwd=abcd
 
 ### Point labels
 
-put the original box labels of train set to point labels derictory, the code will convert them to coarse point labels without manual intervention.
+put the original box labels of train set to point labels derictory, the code will convert them to coarse point labels.
 
 ### Prediction and generation of pseudo labels
 
