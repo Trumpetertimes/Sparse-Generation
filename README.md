@@ -70,4 +70,4 @@ With yolov5s:
 
 ## Other methods in comparison experiment
 
-P2BNet and Group RCNN were evaluated, yolov5s was trained with their pseudo labels generated.  
+P2BNet, Group RCNN and PLUG were evaluated, yolov5s was trained with their pseudo labels generated.  
