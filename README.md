@@ -20,10 +20,10 @@ SIMD dataset (https://github.com/ihians/simd.git)
 
 ## How to run:
 Only need to use a small set of supervised annotation data to train a pre-model, use this pre-trained model to predict the pseudo labels on entire dataset.
-We validated on four different datasets(MS COCO-5000, RSOD, SIMD, Bullet-Hole).
+We validated on four different datasets(MS COCO-val, RSOD, SIMD, Bullet-Hole).
 
 ### pre-trained weights
-The pre-trained weights for yolov5s on MS COCO-5000, RSOD-aircraft, RSOD-oiltank, SIMD:
+The pre-trained weights for yolov5s on MS COCO-val(val2017,5000 images), RSOD-aircraft, RSOD-oiltank, SIMD:
 
 https://pan.baidu.com/s/1eXfbLB0-NRaVXk4xe1oo8w?pwd=abcd
 
